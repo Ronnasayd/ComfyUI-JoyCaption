@@ -128,6 +128,10 @@ class JC_Models:
                 self.target_size = (expected_size.get('height', 336), expected_size.get('width', 336))
             elif isinstance(expected_size, (list, tuple)):
                 self.target_size = tuple(expected_size) if len(expected_size) == 2 else (expected_size[0], expected_size[0])
+            elif hasattr(expected_size, 'height') and hasattr(expected_size, 'width'):
+                # why: transformers>=4.49 returns a SizeDict dataclass, not a dict (issue #61)
+                edge = getattr(expected_size, 'shortest_edge', None) or 336
+                self.target_size = (expected_size.height or edge, expected_size.width or edge)
             else:
                 self.target_size = (expected_size, expected_size)
         else:
